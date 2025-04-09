@@ -11,8 +11,9 @@ const Dashboard = () => {
         <nav>
           <ul>
             <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/add-medicine">Add Medicine</Link></li>
+            <li><Link to="/add-medicine"className="nav-link">Add Medicine</Link></li>
             <li><Link to="/update-medicine">Update Medicine</Link></li>
+            <li><Link to="/view-medicine">View Medicine</Link></li>
             <li><Link to="/billing">Billing</Link></li>
             <li><Link to="/purchase-order">Purchase Order</Link></li>
           </ul>

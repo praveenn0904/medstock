@@ -1,0 +1,82 @@
+/* src/styles/Billing.css */
+
+.billing-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .billing-container h2 {
+    text-align: center;
+    color: #0d1a3f;
+    margin-bottom: 2rem;
+  }
+  
+  .billing-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  
+  .billing-item input {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+  }
+  
+  .remove-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .add-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+  
+  .billing-summary {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .billing-summary h3 {
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .total {
+    font-size: 2rem;
+    color: #28a745;
+    margin: 0.5rem 0;
+  }
+  
+  .checkout-btn {
+    margin-top: 1rem;
+    padding: 0.8rem 2rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
