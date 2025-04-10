@@ -10,42 +10,61 @@ function AddMedicine() {
     expiryDate: '',
     price: '',
     manufacturer: '',
-    photo: null,
   });
 
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value } = e.target;
     setMedicineData((prevData) => ({
       ...prevData,
-      [name]: type === 'file' ? files[0] : value,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // For now, just logging the data
-    console.log('Medicine Data:', medicineData);
+    try {
+      const res = await fetch('http://localhost:5000/api/medicine/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(medicineData),
+      });
 
-    // You can add API submission logic here later
-    alert("Medicine added successfully!");
+      if (!res.ok) {
+        const err = await res.json();
+        setErrorMsg(err.message || "Something went wrong");
+        return;
+      }
 
-    // Reset form
-    setMedicineData({
-      id: '',
-      name: '',
-      quantity: '',
-      manufacturedDate: '',
-      expiryDate: '',
-      price: '',
-      manufacturer: '',
-      photo: null,
-    });
+      setSuccessMsg("Medicine added successfully!");
+      setErrorMsg('');
+      setMedicineData({
+        id: '',
+        name: '',
+        quantity: '',
+        manufacturedDate: '',
+        expiryDate: '',
+        price: '',
+        manufacturer: '',
+      });
+    } catch (error) {
+      setErrorMsg("Failed to add medicine. Please try again.");
+      console.error(error);
+    }
   };
 
   return (
     <div className="add-medicine-container">
       <h2>Add New Medicine</h2>
+
+      {successMsg && <div className="success-msg">{successMsg}</div>}
+      {errorMsg && <div className="error-msg">{errorMsg}</div>}
+
       <form className="add-medicine-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Medicine ID</label>
@@ -73,18 +92,13 @@ function AddMedicine() {
         </div>
 
         <div className="form-group">
-          <label>Price</label>
+          <label>Price (₹)</label>
           <input type="number" name="price" value={medicineData.price} onChange={handleChange} required />
         </div>
 
         <div className="form-group full-width">
-          <label>Medicine Photo</label>
-          <input type="file" name="photo" accept="image/*" onChange={handleChange} />
-        </div>
-
-        <div className="form-group full-width">
           <label>Manufacturer Details</label>
-          <textarea name="manufacturer" value={medicineData.manufacturer} onChange={handleChange} rows="3" required></textarea>
+          <textarea name="manufacturer" value={medicineData.manufacturer} onChange={handleChange} rows="3" required />
         </div>
 
         <button type="submit" className="submit-btn">Add Medicine</button>
