@@ -17,11 +17,32 @@ const UpdateMedicine = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Medicine:", formData);
-    alert("Medicine details updated successfully!");
+  
+    try {
+      const res = await fetch(`http://localhost:5000/api/medicine/${formData.medicineId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        alert("Medicine details updated successfully!");
+        console.log("Updated:", data);
+      } else {
+        const errData = await res.json();
+        alert("Failed to update medicine: " + errData.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error while updating medicine.");
+    }
   };
+  
 
   return (
     <div className="update-medicine-container">

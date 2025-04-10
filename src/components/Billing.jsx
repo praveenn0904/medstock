@@ -4,6 +4,13 @@ import html2canvas from "html2canvas";
 import "../styles/Billing.css";
 
 const Billing = () => {
+  const [invoiceNo, setInvoiceNo] = useState(1);
+  const [customer, setCustomer] = useState({
+    name: "",
+    gstin: "",
+    place: "",
+  });
+
   const [items, setItems] = useState([
     {
       name: "",
@@ -35,11 +42,6 @@ const Billing = () => {
     ]);
   };
 
-  const removeItem = (index) => {
-    const updated = items.filter((_, i) => i !== index);
-    setItems(updated);
-  };
-
   const getTotalValue = (item) => {
     const price = parseFloat(item.mrp) || 0;
     const qty = parseInt(item.qty) || 0;
@@ -48,9 +50,8 @@ const Billing = () => {
   };
 
   const totalTaxableValue = items.reduce((acc, item) => acc + getTotalValue(item), 0);
-  const taxAmount1 = totalTaxableValue * 0.12;
-  const taxAmount2 = totalTaxableValue * 0.12;
-  const grandTotal = totalTaxableValue + taxAmount1+taxAmount2;
+  const taxAmount = totalTaxableValue * 0.12;
+  const grandTotal = totalTaxableValue + taxAmount;
 
   const formatCurrency = (num) =>
     new Intl.NumberFormat("en-IN", {
@@ -71,29 +72,82 @@ const Billing = () => {
     });
   };
 
+  const submitInvoice = async () => {
+    const payload = {
+      invoiceNo,
+      date: new Date().toLocaleDateString(),
+      customer,
+      items,
+      totalTaxableValue,
+      taxAmount,
+      grandTotal,
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/api/invoices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert("Invoice submitted successfully!");
+        setInvoiceNo((prev) => prev + 1); // Increment invoice no
+      } else {
+        alert("Submission failed.");
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("An error occurred.");
+    }
+  };
+
   return (
     <div className="billing-wrapper">
       <div className="invoice" id="invoice">
         <header className="company-info">
           <center>
-          <h2>Sre Amman Pharma Agency</h2>
-          <h6>36, Pavadai Street, Erode - 638 001.</h6><br></br>
-          <h6>GST: 33AYDPS3699G1Z1</h6>  
-          <p>📞 9994553777 || 9443380004 || 9976853777</p><br></br>
+          <h2>Sree Amman Pharma Agency</h2>
           </center>
+          <p>36, Pavadai Street, Erode - 638 001</p>
+          <p>GSTIN: 33AYDPS3699G1Z1</p>
+          <p>📞 9994553777 | 9443380004 | 9976853777</p><br></br>
           <hr />
         </header>
 
         <div className="meta-info">
           <div>
-            <strong>Invoice No:</strong> 001
+            <strong>Invoice No:</strong> {invoiceNo}
             <br />
             <strong>Invoice Date:</strong> {new Date().toLocaleDateString()}
           </div>
           <div>
-            <strong>Customer:</strong> HealthPro Pharmacy
-            <br />
-            <strong>Place of Supply:</strong> Maharashtra
+            <label>
+              Customer:
+              <input
+                value={customer.name}
+                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                placeholder="Customer Name"
+              />
+            </label>
+            <label>
+              GSTIN:
+              <input
+                value={customer.gstin}
+                onChange={(e) => setCustomer({ ...customer, gstin: e.target.value })}
+                placeholder="GSTIN"
+              />
+            </label>
+            <label>
+              Place of Supply:
+              <input
+                value={customer.place}
+                onChange={(e) => setCustomer({ ...customer, place: e.target.value })}
+                placeholder="Place of Supply"
+              />
+            </label>
           </div>
         </div>
 
@@ -102,7 +156,7 @@ const Billing = () => {
             <tr>
               <th>Sr.</th>
               <th>Name</th>
-             <th>MFG</th>
+              <th>MFG</th>
               <th>Expiry</th>
               <th>Qty</th>
               <th>MRP</th>
@@ -130,21 +184,25 @@ const Billing = () => {
 
         <div className="totals">
           <p><strong>Taxable Total:</strong> {formatCurrency(totalTaxableValue)}</p>
-          <p><strong>CGST (12%):</strong> {formatCurrency(taxAmount1)}</p>
-          <p><strong>SGST (12%):</strong> {formatCurrency(taxAmount2)}</p>
-          <br></br>
+          <p><strong>IGST (12%):</strong> {formatCurrency(taxAmount)}</p><br></br>
           <center>
           <h3>Grand Total: {formatCurrency(grandTotal)}</h3>
           </center>
         </div>
-
+          <br></br>
+          <hr></hr>
         <footer>
+          <p><strong>Bank Details:</strong> ICICI, A/C: 2715500356, IFSC: ICIC045F</p>
+          <p><strong>UPI ID:</strong> ifox@icici</p>
           <p>Thanks for your order! We look forward to working with you again soon.</p>
         </footer>
       </div>
 
       <div style={{ textAlign: "center", marginTop: "2rem" }}>
         <button className="checkout-btn" onClick={downloadPDF}>Download PDF</button>
+        <button className="checkout-btn" onClick={submitInvoice} style={{ marginLeft: "1rem" }}>
+          Submit
+        </button>
       </div>
     </div>
   );

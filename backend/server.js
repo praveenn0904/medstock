@@ -17,7 +17,8 @@ const signupRoute = require('./routes/signupRoute');
 const loginRoute = require('./routes/loginRoute');
 const medicineRoute = require('./routes/medicineRoute');
 const dashboardRoute = require('./routes/dashboardRoute');
-
+const resetPasswordRoute = require('./routes/resetpasswordRoute');
+const billingRoute = require('./routes/invoiceRoute');
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -31,6 +32,8 @@ app.use('/api/signup', signupRoute);
 app.use('/api/login', loginRoute);
 app.use('/api/medicine', medicineRoute);  // 🔥 includes /api/medicine/all for View Medicine
 app.use('/api/dashboard', dashboardRoute);
+app.use('/api/reset-password', resetPasswordRoute);
+app.use('/api/invoices', billingRoute);
 
 // Default Route
 app.get('/', (req, res) => {

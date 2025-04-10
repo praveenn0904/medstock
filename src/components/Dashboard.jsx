@@ -32,17 +32,11 @@ const Dashboard = () => {
         <header className="topbar">
           <input type="text" placeholder="Search" className="search-bar" />
           <div className="top-icons">
-            <Bell size={20} />
-            <ShoppingCart size={20} />
-            <div className="profile-icon"><User size={20} /></div>
           </div>
         </header>
 
         <section className="performance-section">
-          <div className="card welcome-card">
-            <h2>Welcome, Admin</h2>
-            <p>Here's your overview for today.</p>
-          </div>
+         
           <div className="card notification-card">
             <h3>Expiring Medicines</h3>
             <p>{stats.expiringSoon} medicines are about to expire.</p>
