@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import "../styles/AddMedicine.css";
+import Sidebar from './SideBar';
 
 function AddMedicine() {
   const [medicineData, setMedicineData] = useState({
@@ -59,50 +60,53 @@ function AddMedicine() {
   };
 
   return (
-    <div className="add-medicine-container">
-      <h2>Add New Medicine</h2>
+    <div className="dashboard-container">
+      <Sidebar />
+      <div className="add-medicine-container">
+        <h2>Add New Medicine</h2>
 
-      {successMsg && <div className="success-msg">{successMsg}</div>}
-      {errorMsg && <div className="error-msg">{errorMsg}</div>}
+        {successMsg && <div className="success-msg">{successMsg}</div>}
+        {errorMsg && <div className="error-msg">{errorMsg}</div>}
 
-      <form className="add-medicine-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Medicine ID</label>
-          <input type="text" name="id" value={medicineData.id} onChange={handleChange} required />
-        </div>
+        <form className="add-medicine-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Medicine ID</label>
+            <input type="text" name="id" value={medicineData.id} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group">
-          <label>Medicine Name</label>
-          <input type="text" name="name" value={medicineData.name} onChange={handleChange} required />
-        </div>
+          <div className="form-group">
+            <label>Medicine Name</label>
+            <input type="text" name="name" value={medicineData.name} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group">
-          <label>Quantity</label>
-          <input type="number" name="quantity" value={medicineData.quantity} onChange={handleChange} required />
-        </div>
+          <div className="form-group">
+            <label>Quantity</label>
+            <input type="number" name="quantity" value={medicineData.quantity} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group">
-          <label>Manufactured Date</label>
-          <input type="date" name="manufacturedDate" value={medicineData.manufacturedDate} onChange={handleChange} required />
-        </div>
+          <div className="form-group">
+            <label>Manufactured Date</label>
+            <input type="date" name="manufacturedDate" value={medicineData.manufacturedDate} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group">
-          <label>Expiry Date</label>
-          <input type="date" name="expiryDate" value={medicineData.expiryDate} onChange={handleChange} required />
-        </div>
+          <div className="form-group">
+            <label>Expiry Date</label>
+            <input type="date" name="expiryDate" value={medicineData.expiryDate} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group">
-          <label>Price (₹)</label>
-          <input type="number" name="price" value={medicineData.price} onChange={handleChange} required />
-        </div>
+          <div className="form-group">
+            <label>Price (₹)</label>
+            <input type="number" name="price" value={medicineData.price} onChange={handleChange} required />
+          </div>
 
-        <div className="form-group full-width">
-          <label>Manufacturer Details</label>
-          <textarea name="manufacturer" value={medicineData.manufacturer} onChange={handleChange} rows="3" required />
-        </div>
+          <div className="form-group full-width">
+            <label>Manufacturer Details</label>
+            <textarea name="manufacturer" value={medicineData.manufacturer} onChange={handleChange} rows="3" required />
+          </div>
 
-        <button type="submit" className="submit-btn">Add Medicine</button>
-      </form>
+          <button type="submit" className="submit-btn">Add Medicine</button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -13,8 +13,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/add-medicine" element={<AddMedicine />} />
-        <Route path="/update-medicine/:id" element={<UpdateMedicine />} />
+        <Route path="/add-medicine" element={<AddMedicine />} />        
+        <Route path="/update-medicine/:id" element={<UpdateMedicine />} /> {/* 💥 This is needed */}
         <Route path="/view-medicine" element={<ViewMedicine />} />
         <Route path="/billing" element={<Billing />} />
       </Routes>

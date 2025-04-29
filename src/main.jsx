@@ -20,7 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/add-medicine" element={<AddMedicine />} /> 
-        <Route path="/update-medicine" element={<UpdateMedicine />} />
+        <Route path="/update-medicine/:id" element={<UpdateMedicine />} /> {/* 💥 This is needed */}
         <Route path="/view-medicine" element={<ViewMedicine />} />
         <Route path="/billing" element={<Billing />} />
       </Routes>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/ViewMedicine.css";
+import Sidebar from './SideBar';
 
 const ViewMedicine = () => {
   const [medicines, setMedicines] = useState([]);
@@ -62,41 +63,45 @@ const ViewMedicine = () => {
   if (loading) return <div className="loading">Loading medicines...</div>;
 
   return (
-    <div className="view-medicine-container">
-      <h2>Sre Amman Pharma Agency Inventory</h2>
+    <div className="dashboard-container">
+      <Sidebar />
+      <div className="scrollable-content">
+        <div className="view-medicine-container">
+          <h2>Sre Amman Pharma Agency Inventory</h2>
 
-      <input
-        type="text"
-        placeholder="Search by medicine name or ID..."
-        className="search-bar"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+          <input
+            type="text"
+            placeholder="Search by medicine name or ID..."
+            className="search-bar"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-      <br /><br />
+          <br /><br />
 
-      {filteredMedicines.length === 0 ? (
-        <p>No medicines found.</p>
-      ) : (
-        <div className="medicine-grid">
-          {filteredMedicines.map((med) => (
-            <div className="medicine-card" key={med._id}>
-              <h3>{med.name}</h3>
-              <p><strong>ID:</strong> {med.id}</p>
-              <p><strong>Medicine Name:</strong> {med.name}</p>
-              <p><strong>Qty:</strong> {med.quantity}</p>
-              <p><strong>Price:</strong> ₹{med.price}</p>
-              <p><strong>Manufactured:</strong> {new Date(med.manufacturedDate).toLocaleDateString()}</p>
-              <p><strong>Expiry:</strong> {new Date(med.expiryDate).toLocaleDateString()}</p>
-              <p><strong>Manufacturer:</strong> {med.manufacturer}</p>
-              <div className="button-group">
-                <button className="edit-btn" onClick={() => handleEdit(med)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDelete(med._id)}>Delete</button>
-              </div>
+          {filteredMedicines.length === 0 ? (
+            <p>No medicines found.</p>
+          ) : (
+            <div className="medicine-grid">
+              {filteredMedicines.map((med) => (
+                <div className="medicine-card" key={med._id}>
+                  <h3>{med.name}</h3>
+                  <p><strong>ID:</strong> {med.id || "N/A"}</p>
+                  <p><strong>Qty:</strong> {med.quantity || "N/A"}</p>
+                  <p><strong>Price:</strong> ₹{med.price || "N/A"}</p>
+                  <p><strong>Manufactured:</strong> {med.manufacturedDate ? new Date(med.manufacturedDate).toLocaleDateString() : "N/A"}</p>
+                  <p><strong>Expiry:</strong> {med.expiryDate ? new Date(med.expiryDate).toLocaleDateString() : "N/A"}</p>
+                  <p><strong>Manufacturer:</strong> {med.manufacturer || "N/A"}</p>
+                  <div className="button-group">
+                    <button className="edit-btn" onClick={() => handleEdit(med)}>Edit</button>
+                    <button className="delete-btn" onClick={() => handleDelete(med._id)}>Delete</button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

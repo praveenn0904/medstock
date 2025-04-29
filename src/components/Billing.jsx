@@ -22,9 +22,25 @@ const Billing = () => {
     },
   ]);
 
-  const handleItemChange = (index, field, value) => {
+  const handleItemChange = async (index, field, value) => {
     const updated = [...items];
     updated[index][field] = field === "qty" ? parseInt(value) : value;
+
+    // Auto-fetch MFG, EXP, MRP
+    if (field === "name" && value.trim()) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/medicines/${value}`);
+        if (res.ok) {
+          const data = await res.json();
+          updated[index].mfgDate = data.mfgDate;
+          updated[index].expDate = data.expDate;
+          updated[index].mrp = data.mrp;
+        }
+      } catch (err) {
+        console.error("Error fetching medicine info", err);
+      }
+    }
+
     setItems(updated);
   };
 
@@ -50,8 +66,9 @@ const Billing = () => {
   };
 
   const totalTaxableValue = items.reduce((acc, item) => acc + getTotalValue(item), 0);
-  const taxAmount = totalTaxableValue * 0.12;
-  const grandTotal = totalTaxableValue + taxAmount;
+  const cgst = totalTaxableValue * 0.06;
+  const sgst = totalTaxableValue * 0.06;
+  const grandTotal = totalTaxableValue + cgst + sgst;
 
   const formatCurrency = (num) =>
     new Intl.NumberFormat("en-IN", {
@@ -79,28 +96,35 @@ const Billing = () => {
       customer,
       items,
       totalTaxableValue,
-      taxAmount,
+      cgst,
+      sgst,
       grandTotal,
     };
 
     try {
       const res = await fetch("http://localhost:5000/api/invoices", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (res.ok) {
-        alert("Invoice submitted successfully!");
-        setInvoiceNo((prev) => prev + 1); // Increment invoice no
+        // Reduce stock
+        await fetch("http://localhost:5000/api/medicines/reduce-stock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
+        });
+
+        alert("Invoice submitted and stock updated!");
+        setInvoiceNo((prev) => prev + 1);
       } else {
-        alert("Submission failed.");
+        const data = await res.json();
+        alert("Submission failed: " + data.message);
       }
-    } catch (error) {
-      console.error("Submit error:", error);
-      alert("An error occurred.");
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting invoice.");
     }
   };
 
@@ -109,11 +133,12 @@ const Billing = () => {
       <div className="invoice" id="invoice">
         <header className="company-info">
           <center>
-          <h2>Sree Amman Pharma Agency</h2>
+            <h2>Sree Amman Pharma Agency</h2>
           </center>
           <p>36, Pavadai Street, Erode - 638 001</p>
           <p>GSTIN: 33AYDPS3699G1Z1</p>
-          <p>📞 9994553777 | 9443380004 | 9976853777</p><br></br>
+          <p>📞 9994553777 | 9443380004 | 9976853777</p>
+          <br />
           <hr />
         </header>
 
@@ -168,12 +193,45 @@ const Billing = () => {
             {items.map((item, idx) => (
               <tr key={idx}>
                 <td>{idx + 1}</td>
-                <td><input value={item.name} onChange={(e) => handleItemChange(idx, "name", e.target.value)} /></td>
-                <td><input value={item.mfgDate} onChange={(e) => handleItemChange(idx, "mfgDate", e.target.value)} /></td>
-                <td><input value={item.expDate} onChange={(e) => handleItemChange(idx, "expDate", e.target.value)} /></td>
-                <td><input type="number" value={item.qty} onChange={(e) => handleItemChange(idx, "qty", e.target.value)} /></td>
-                <td><input type="number" value={item.mrp} onChange={(e) => handleItemChange(idx, "mrp", e.target.value)} /></td>
-                <td><input type="number" value={item.discount} onChange={(e) => handleItemChange(idx, "discount", e.target.value)} /></td>
+                <td>
+                  <input
+                    value={item.name}
+                    onChange={(e) => handleItemChange(idx, "name", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={item.mfgDate}
+                    onChange={(e) => handleItemChange(idx, "mfgDate", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={item.expDate}
+                    onChange={(e) => handleItemChange(idx, "expDate", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.qty}
+                    onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.mrp}
+                    onChange={(e) => handleItemChange(idx, "mrp", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.discount}
+                    onChange={(e) => handleItemChange(idx, "discount", e.target.value)}
+                  />
+                </td>
                 <td>{formatCurrency(getTotalValue(item))}</td>
               </tr>
             ))}
@@ -184,13 +242,15 @@ const Billing = () => {
 
         <div className="totals">
           <p><strong>Taxable Total:</strong> {formatCurrency(totalTaxableValue)}</p>
-          <p><strong>IGST (12%):</strong> {formatCurrency(taxAmount)}</p><br></br>
+          <p><strong>CGST (6%):</strong> {formatCurrency(cgst)}</p>
+          <p><strong>SGST (6%):</strong> {formatCurrency(sgst)}</p>
+          <br />
           <center>
-          <h3>Grand Total: {formatCurrency(grandTotal)}</h3>
+            <h3>Grand Total: {formatCurrency(grandTotal)}</h3>
           </center>
         </div>
-          <br></br>
-          <hr></hr>
+        <br />
+        <hr />
         <footer>
           <p><strong>Bank Details:</strong> ICICI, A/C: 2715500356, IFSC: ICIC045F</p>
           <p><strong>UPI ID:</strong> ifox@icici</p>

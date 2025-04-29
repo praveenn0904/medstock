@@ -1,24 +1,20 @@
-const mongoose = require('mongoose');
+// models/Invoice.js
 
-const ItemSchema = new mongoose.Schema({
-  name: String,
-  mfgDate: String,
-  expDate: String,
-  qty: Number,
-  mrp: Number,
-  discount: Number
+const mongoose = require("mongoose");
+
+const invoiceSchema = new mongoose.Schema({
+  invoiceNo: Number,
+  date: String,
+  customer: {
+    name: String,
+    gstin: String,
+    place: String,
+  },
+  items: Array,
+  totalTaxableValue: Number,
+  cgst: Number,
+  sgst: Number,
+  grandTotal: Number,
 });
 
-const InvoiceSchema = new mongoose.Schema({
-  invoiceNo: String,
-  invoiceDate: String,
-  customerName: String,
-  customerGSTIN: String,
-  placeOfSupply: String,
-  items: [ItemSchema],
-  taxableTotal: Number,
-  taxAmount: Number,
-  grandTotal: Number
-});
-
-module.exports = mongoose.model('Invoice', InvoiceSchema);
+module.exports = mongoose.model("Invoice", invoiceSchema);

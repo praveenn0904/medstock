@@ -29,7 +29,11 @@ const medicineSchema = new mongoose.Schema({
   manufacturer: {
     type: String,
     required: true
-  }
-}, { timestamps: true });
+  },
+}, {
+  timestamps: true // automatically adds createdAt and updatedAt
+});
 
-module.exports = mongoose.model('Medicine', medicineSchema);
+const Medicine = mongoose.model('Medicine', medicineSchema);
+
+module.exports = Medicine;
