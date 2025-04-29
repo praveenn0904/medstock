@@ -12,6 +12,7 @@ const Sidebar = () => {
           <li><Link to="/add-medicine">Add Medicine</Link></li>
           <li><Link to="/view-medicine">View Medicine</Link></li>
           <li><Link to="/billing">Billing</Link></li>
+
         </ul>
       </nav>
     </aside>

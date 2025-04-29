@@ -1,6 +1,4 @@
-// models/Invoice.js
-
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const invoiceSchema = new mongoose.Schema({
   invoiceNo: Number,
@@ -10,11 +8,21 @@ const invoiceSchema = new mongoose.Schema({
     gstin: String,
     place: String,
   },
-  items: Array,
+  items: [
+    {
+      id: String,
+      name: String,
+      mfgDate: String,
+      expDate: String,
+      qty: Number,
+      mrp: String,
+      discount: Number,
+    },
+  ],
   totalTaxableValue: Number,
   cgst: Number,
   sgst: Number,
   grandTotal: Number,
 });
 
-module.exports = mongoose.model("Invoice", invoiceSchema);
+module.exports = mongoose.model('Invoice', invoiceSchema);

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Medicine = require('../models/medicineModel'); // Adjust path as needed
+const Invoice = require('../models/invoiceModel'); // Adjust path if needed
 
 // Add new medicine
 router.post('/add', async (req, res) => {
@@ -29,11 +30,11 @@ router.get('/all', async (req, res) => {
 // Get medicine by ID
 router.get('/:id', async (req, res) => {
   try {
-    const medicine = await Medicine.findById(req.params.id);
+    const medicine = await Medicine.findOne({ id: req.params.id });
     if (!medicine) return res.status(404).json({ error: 'Medicine not found' });
     res.json(medicine);
   } catch (err) {
-    console.error('Error fetching medicine:', err);
+    console.error('Error fetching medicine by custom ID:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -52,7 +53,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
 // Delete medicine by ID
 router.delete('/delete/:id', async (req, res) => {
   try {
@@ -62,6 +62,62 @@ router.delete('/delete/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting medicine:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Create new invoice
+router.post('/', async (req, res) => {
+  try {
+    const invoice = new Invoice(req.body);
+    await invoice.save();
+    res.status(201).json({ message: 'Invoice saved successfully' });
+  } catch (err) {
+    console.error('Error saving invoice:', err);
+    res.status(500).json({ message: 'Server error saving invoice' });
+  }
+});
+
+// Reduce stock for invoiced medicines
+router.post('/reduce-stock', async (req, res) => {
+  const { items } = req.body;
+
+  try {
+    // Loop over each item in the invoice to reduce the stock
+    for (const item of items) {
+      const med = await Medicine.findOne({ id: item.id }); // Find medicine by ID
+
+      // If medicine is found
+      if (med) {
+        // Check if there is enough stock
+        if (med.quantity < item.qty) {
+          // If stock is insufficient, return an error response
+          return res.status(400).json({
+            message: `Insufficient stock for medicine: ${med.name} (ID: ${med.id}) - Available: ${med.quantity}, Requested: ${item.qty}`
+          });
+        }
+
+        // Reduce the stock
+        med.quantity -= item.qty;
+
+        // Ensure quantity doesn't go negative
+        if (med.quantity < 0) med.quantity = 0;
+
+        // Save the updated medicine document
+        await med.save();
+      } else {
+        // If medicine not found, return error
+        return res.status(404).json({
+          message: `Medicine with ID: ${item.id} not found`
+        });
+      }
+    }
+
+    // If all items are processed successfully, respond with success message
+    res.status(200).json({ message: 'Stock updated successfully' });
+
+  } catch (err) {
+    console.error('Error reducing stock:', err);
+    res.status(500).json({ message: 'Error updating stock' });
   }
 });
 

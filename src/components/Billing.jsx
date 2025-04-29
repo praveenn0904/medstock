@@ -13,6 +13,7 @@ const Billing = () => {
 
   const [items, setItems] = useState([
     {
+      id: "",
       name: "",
       mfgDate: "",
       expDate: "",
@@ -25,29 +26,40 @@ const Billing = () => {
   const handleItemChange = async (index, field, value) => {
     const updated = [...items];
     updated[index][field] = field === "qty" ? parseInt(value) : value;
-
-    // Auto-fetch MFG, EXP, MRP
-    if (field === "name" && value.trim()) {
-      try {
-        const res = await fetch(`http://localhost:5000/api/medicines/${value}`);
-        if (res.ok) {
-          const data = await res.json();
-          updated[index].mfgDate = data.mfgDate;
-          updated[index].expDate = data.expDate;
-          updated[index].mrp = data.mrp;
+    
+    if (field === "id") {
+      updated[index].name = "";
+      updated[index].mfgDate = "";
+      updated[index].expDate = "";
+      updated[index].mrp = "";
+  
+      if (value.trim()) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/medicine/${value}`);
+          if (res.ok) {
+            const data = await res.json();
+            updated[index].name = data.name;
+            updated[index].mfgDate = data.manufacturedDate;
+            updated[index].expDate = data.expiryDate;
+            updated[index].mrp = data.price;
+          } else {
+            console.warn("Medicine not found for ID:", value);
+          }
+        } catch (err) {
+          console.error("Error fetching medicine info by ID", err);
         }
-      } catch (err) {
-        console.error("Error fetching medicine info", err);
       }
     }
-
+  
     setItems(updated);
   };
+  
 
   const addItem = () => {
     setItems([
       ...items,
       {
+        id: "",
         name: "",
         mfgDate: "",
         expDate: "",
@@ -100,33 +112,40 @@ const Billing = () => {
       sgst,
       grandTotal,
     };
-
+  
     try {
       const res = await fetch("http://localhost:5000/api/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      if (res.ok) {
-        // Reduce stock
-        await fetch("http://localhost:5000/api/medicines/reduce-stock", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items }),
-        });
-
+  
+      if (!res.ok) {
+        const data = await res.json();
+        alert("Invoice submission failed: " + data.message);
+        return;
+      }
+  
+      // Attempt stock reduction only after successful invoice save
+      const stockRes = await fetch("http://localhost:5000/api/medicine/reduce-stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+  
+      if (stockRes.ok) {
         alert("Invoice submitted and stock updated!");
         setInvoiceNo((prev) => prev + 1);
       } else {
-        const data = await res.json();
-        alert("Submission failed: " + data.message);
+        const stockError = await stockRes.json();
+        alert("Invoice saved, but stock update failed:\n" + stockError.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Error submitting invoice.");
+      alert("An unexpected error occurred while submitting invoice.");
     }
   };
+  
 
   return (
     <div className="billing-wrapper">
@@ -180,6 +199,7 @@ const Billing = () => {
           <thead>
             <tr>
               <th>Sr.</th>
+              <th>ID</th>
               <th>Name</th>
               <th>MFG</th>
               <th>Expiry</th>
@@ -193,6 +213,13 @@ const Billing = () => {
             {items.map((item, idx) => (
               <tr key={idx}>
                 <td>{idx + 1}</td>
+                <td>
+                  <input
+                    value={item.id}
+                    onChange={(e) => handleItemChange(idx, "id", e.target.value)}
+                    placeholder="Medicine ID"
+                  />
+                </td>
                 <td>
                   <input
                     value={item.name}
@@ -249,6 +276,7 @@ const Billing = () => {
             <h3>Grand Total: {formatCurrency(grandTotal)}</h3>
           </center>
         </div>
+
         <br />
         <hr />
         <footer>
