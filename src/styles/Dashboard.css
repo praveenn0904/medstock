@@ -61,6 +61,7 @@ body {
 .sidebar ul li a.active {
   background: rgba(255, 255, 255, 0.1);
 }
+
 .logout-btn {
   background-color: #ff4d4d;
   color: white;
@@ -74,7 +75,6 @@ body {
 .logout-btn:hover {
   background-color: #d93636;
 }
-
 
 .main-content {
   flex: 1;
@@ -158,6 +158,26 @@ body {
 
 .card ul li strong {
   color: var(--primary);
+}
+
+.chart-section {
+  margin-bottom: 2rem;
+}
+
+.recent-meds {
+  padding-left: 1.2rem;
+  color: var(--gray);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.recent-meds li {
+  margin-bottom: 0.5rem;
+}
+
+.low-stock {
+  color: #b91c1c;
+  font-weight: bold;
 }
 
 button {

@@ -4,7 +4,6 @@ import html2canvas from "html2canvas";
 import "../styles/Billing.css";
 
 const Billing = () => {
-  const [invoiceNo, setInvoiceNo] = useState(1);
   const [customer, setCustomer] = useState({
     name: "",
     gstin: "",
@@ -23,24 +22,32 @@ const Billing = () => {
     },
   ]);
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return isNaN(date.getTime())
+      ? dateStr
+      : date.toLocaleDateString("en-GB"); // DD/MM/YYYY
+  };
+
   const handleItemChange = async (index, field, value) => {
     const updated = [...items];
     updated[index][field] = field === "qty" ? parseInt(value) : value;
-    
+
     if (field === "id") {
       updated[index].name = "";
       updated[index].mfgDate = "";
       updated[index].expDate = "";
       updated[index].mrp = "";
-  
+
       if (value.trim()) {
         try {
-          const res = await fetch(`http://localhost:5000/api/medicine/${value}`);
+          const res = await fetch(`https://medstock-backend-oymi.onrender.com/api/medicine/${value}`);
           if (res.ok) {
             const data = await res.json();
             updated[index].name = data.name;
-            updated[index].mfgDate = data.manufacturedDate;
-            updated[index].expDate = data.expiryDate;
+            updated[index].mfgDate = formatDate(data.manufacturedDate);
+            updated[index].expDate = formatDate(data.expiryDate);
             updated[index].mrp = data.price;
           } else {
             console.warn("Medicine not found for ID:", value);
@@ -50,10 +57,9 @@ const Billing = () => {
         }
       }
     }
-  
+
     setItems(updated);
   };
-  
 
   const addItem = () => {
     setItems([
@@ -103,8 +109,7 @@ const Billing = () => {
 
   const submitInvoice = async () => {
     const payload = {
-      invoiceNo,
-      date: new Date().toLocaleDateString(),
+      date: new Date().toLocaleDateString("en-GB"),
       customer,
       items,
       totalTaxableValue,
@@ -112,30 +117,28 @@ const Billing = () => {
       sgst,
       grandTotal,
     };
-  
+
     try {
-      const res = await fetch("http://localhost:5000/api/invoices", {
+      const res = await fetch("https://medstock-backend-oymi.onrender.com/api/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
+
       if (!res.ok) {
         const data = await res.json();
         alert("Invoice submission failed: " + data.message);
         return;
       }
-  
-      // Attempt stock reduction only after successful invoice save
-      const stockRes = await fetch("http://localhost:5000/api/medicine/reduce-stock", {
+
+      const stockRes = await fetch("https://medstock-backend-oymi.onrender.com/api/medicine/reduce-stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
-  
+
       if (stockRes.ok) {
         alert("Invoice submitted and stock updated!");
-        setInvoiceNo((prev) => prev + 1);
       } else {
         const stockError = await stockRes.json();
         alert("Invoice saved, but stock update failed:\n" + stockError.message);
@@ -145,14 +148,13 @@ const Billing = () => {
       alert("An unexpected error occurred while submitting invoice.");
     }
   };
-  
 
   return (
     <div className="billing-wrapper">
       <div className="invoice" id="invoice">
         <header className="company-info">
           <center>
-            <h2>Sree Amman Pharma Agency</h2>
+            <h2>Sre Amman Pharma Agency</h2>
           </center>
           <p>36, Pavadai Street, Erode - 638 001</p>
           <p>GSTIN: 33AYDPS3699G1Z1</p>
@@ -163,9 +165,7 @@ const Billing = () => {
 
         <div className="meta-info">
           <div>
-            <strong>Invoice No:</strong> {invoiceNo}
-            <br />
-            <strong>Invoice Date:</strong> {new Date().toLocaleDateString()}
+            <strong>Invoice Date:</strong> {new Date().toLocaleDateString("en-GB")}
           </div>
           <div>
             <label>

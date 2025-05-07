@@ -40,7 +40,7 @@ const UpdateMedicine = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:5000/api/medicine/${formData._id}`, {
+      const res = await fetch(`https://medstock-backend-oymi.onrender.com/api/medicine/${formData._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

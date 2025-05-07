@@ -24,7 +24,7 @@ const ViewMedicine = () => {
 
   const fetchMedicines = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/medicine/all');
+      const res = await fetch('https://medstock-backend-oymi.onrender.com/api/medicine/all');
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setMedicines(data);
@@ -40,7 +40,7 @@ const ViewMedicine = () => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/medicine/delete/${id}`, {
+      const res = await fetch(`https://medstock-backend-oymi.onrender.com/api/medicine/delete/${id}`, {
         method: 'DELETE',
       });
 

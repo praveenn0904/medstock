@@ -18,13 +18,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
-      const res = await fetch("http://localhost:5000/api/dashboard/stats");
+      const res = await fetch("https://medstock-backend-oymi.onrender.com/api/dashboard/stats");
       const data = await res.json();
       setStats(data);
     };
 
     const fetchMedicines = async () => {
-      const res = await fetch("http://localhost:5000/api/medicine/all");
+      const res = await fetch("https://medstock-backend-oymi.onrender.com/api/medicine/all");
       const data = await res.json();
       setMedicines(data);
     };
@@ -45,10 +45,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to logout?");
     if (confirmLogout) {
-      // Clear any stored user/session data if applicable
-      // localStorage.removeItem('user'); or sessionStorage.clear(); as needed
-
-      navigate("/"); // Redirect to login page
+      navigate("/");
     }
   };
 
@@ -101,20 +98,22 @@ const Dashboard = () => {
         </section>
 
         <section className="chart-section">
-          <h3>Low Stock Medicines</h3>
-          {medicines.filter(med => med.quantity <= 10).length === 0 ? (
-            <p>No low stock medicines.</p>
-          ) : (
-            <ul className="recent-meds">
-              {medicines
-                .filter(med => med.quantity <= 10)
-                .map((med) => (
-                  <li key={med._id}>
-                    <strong>{med.name}</strong> – Qty: {med.quantity}, Exp: {new Date(med.expiryDate).toLocaleDateString()}
-                  </li>
-                ))}
-            </ul>
-          )}
+          <div className="card">
+            <h3>Low Stock Medicines</h3>
+            {medicines.filter(med => med.quantity <= 10).length === 0 ? (
+              <p>No low stock medicines.</p>
+            ) : (
+              <ul className="recent-meds">
+                {medicines
+                  .filter(med => med.quantity <= 10)
+                  .map((med) => (
+                    <li key={med._id}>
+                      <strong className="low-stock">{med.name}</strong> – Qty: {med.quantity}, Exp: {new Date(med.expiryDate).toLocaleDateString()}
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
         </section>
 
       </div>

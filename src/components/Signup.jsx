@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../styles/login.css';
 
 function Signup() {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({email: '', password: '' });
   const navigate = useNavigate();
 
   const handleChange = e => {
@@ -14,7 +14,7 @@ function Signup() {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:5000/api/signup', {
+      const res = await fetch('https://medstock-backend-oymi.onrender.com/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -48,7 +48,7 @@ function Signup() {
             placeholder="Username"
             value={form.username}
             onChange={handleChange}
-            required
+            
           />
           <input
             type="email"
@@ -56,7 +56,7 @@ function Signup() {
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            required
+            
           />
           <input
             type="password"
@@ -64,7 +64,7 @@ function Signup() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            required
+           
           />
           <button type="submit">Sign Up</button>
         </form>
